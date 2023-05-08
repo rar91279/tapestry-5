@@ -12,6 +12,7 @@
 
 package org.apache.tapestry5.plastic;
 
+import java.lang.invoke.*;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
@@ -413,9 +414,31 @@ public class PlasticUtils
         @Override
         public String toString() 
         {
-            return "FieldInfo [name=" + name + ", type=" + type + "]";
-        }
-        
-    }
-    
+			return "FieldInfo [name=" + name + ", type=" + type + "]";
+		}
+		
+	}
+	
+	private static final VarHandle signatureAccessor;
+	
+	static
+	{
+		try
+		{
+			signatureAccessor = MethodHandles.privateLookupIn(Method.class, MethodHandles.lookup())
+					.findVarHandle(Method.class, "signature", String.class);
+			
+		} catch (IllegalAccessException | NoSuchFieldException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static String getGenericSignatureOfMethod(Method method) {
+		if (signatureAccessor != null)
+		{
+			return (String) signatureAccessor.get(method);
+		}
+		return null;
+	}
 }
