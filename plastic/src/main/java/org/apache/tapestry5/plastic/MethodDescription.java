@@ -14,13 +14,9 @@ package org.apache.tapestry5.plastic;
 
 import org.apache.tapestry5.internal.plastic.PlasticInternalUtils;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Describes a {@link PlasticMethod} in terms of a method name, a set of modifiers
@@ -28,32 +24,27 @@ import java.util.function.Supplier;
  * and types of checked exceptions. Types are represented as Java source names:
  * either names of primitives ("void", "byte", "long") or fully qualified class names ("java.lang.Object",
  * "java.lang.Runnable"). ASM refers to this as "class name".
- * <p>
+ *
  * MethodDescriptions are immutable, and properly implement equals() and hashCode(); they are often used as keys in
  * Maps.
- * <p>
+ *
  * The natural sort order for a MethodDescription is ascending order by method name, then descending order by number of
  * parameters (for the same name). Sort order is not currently specified for overrides of the same method with the same
  * number of parameters.
- * <p>
+ *
  * TODO: Handling generic types.
  */
-public class MethodDescription implements Comparable<MethodDescription> {
-
-
+public class MethodDescription implements Comparable<MethodDescription>
+{
     /**
      * The full set of modifier flags for the method.
      */
     public final int modifiers;
 
-    /**
-     * The Java source name for the return type, e.g., "void", "short", "java.util.Map", "java.lang.String[]".
-     */
+    /** The Java source name for the return type, e.g., "void", "short", "java.util.Map", "java.lang.String[]". */
     public final String returnType;
 
-    /**
-     * The name of the method.
-     */
+    /** The name of the method. */
     public final String methodName;
 
     public final String genericSignature;
@@ -64,47 +55,54 @@ public class MethodDescription implements Comparable<MethodDescription> {
      */
     public final String[] argumentTypes;
 
-    /**
-     * A non-null array of Java source names for checked exceptions. Do not modify the contents of this array.
-     */
+    /** A non-null array of Java source names for checked exceptions. Do not modify the contents of this array. */
     public final String[] checkedExceptionTypes;
 
     /**
      * Convenience constructor for public methods that have no checked exceptions.
      *
-     * @param returnType    return type as type name
-     * @param methodName    name of method
-     * @param argumentTypes type names for arguments
+     * @param returnType
+     *            return type as type name
+     * @param methodName
+     *            name of method
+     * @param argumentTypes
+     *            type names for arguments
      */
-    public MethodDescription(String returnType, String methodName, String... argumentTypes) {
+    public MethodDescription(String returnType, String methodName, String... argumentTypes)
+    {
         this(Modifier.PUBLIC, returnType, methodName, argumentTypes, null, null);
     }
 
     /**
      * Convenience constructor for copying a MethodDescription with
      * different exception types.
-     *
      * @since 5.4.4
      */
-    public MethodDescription(MethodDescription description, String[] checkedExceptionTypes) {
-        this.argumentTypes = description.argumentTypes;
-        this.checkedExceptionTypes = checkedExceptionTypes;
-        this.genericSignature = description.genericSignature;
-        this.methodName = description.methodName;
-        this.modifiers = description.modifiers;
-        this.returnType = description.returnType;
+    public MethodDescription(MethodDescription description, String[] checkedExceptionTypes)
+    {
+	this.argumentTypes = description.argumentTypes;
+	this.checkedExceptionTypes = checkedExceptionTypes;
+	this.genericSignature = description.genericSignature;
+	this.methodName = description.methodName;
+	this.modifiers = description.modifiers;
+	this.returnType = description.returnType;
     }
 
     /**
      * @param modifiers
-     * @param returnType            Java source name for the return type
+     * @param returnType
+     *            Java source name for the return type
      * @param methodName
-     * @param argumentTypes         may be null
-     * @param genericSignature      TODO
-     * @param checkedExceptionTypes may be null
+     * @param argumentTypes
+     *            may be null
+     * @param genericSignature
+     *            TODO
+     * @param checkedExceptionTypes
+     *            may be null
      */
     public MethodDescription(int modifiers, String returnType, String methodName, String[] argumentTypes,
-                             String genericSignature, String[] checkedExceptionTypes) {
+            String genericSignature, String[] checkedExceptionTypes)
+    {
         assert PlasticInternalUtils.isNonBlank(returnType);
         assert PlasticInternalUtils.isNonBlank(methodName);
 
@@ -117,15 +115,15 @@ public class MethodDescription implements Comparable<MethodDescription> {
         this.checkedExceptionTypes = PlasticInternalUtils.orEmpty(checkedExceptionTypes);
     }
 
-    public MethodDescription withModifiers(int newModifiers) {
+    public MethodDescription withModifiers(int newModifiers)
+    {
         return new MethodDescription(newModifiers, returnType, methodName, argumentTypes, genericSignature,
                 checkedExceptionTypes);
     }
 
-    /**
-     * Creates a MethodDescription from a Java Method. The generic signature will be null.
-     */
-    public MethodDescription(Method method) {
+    /** Creates a MethodDescription from a Java Method. The generic signature will be null. */
+    public MethodDescription(Method method)
+    {
         this(method.getModifiers(), PlasticUtils.toTypeName(method.getReturnType()), method.getName(), PlasticUtils
                 .toTypeNames(method.getParameterTypes()), PlasticUtils.getGenericSignatureOfMethod(method), PlasticUtils.toTypeNames(method.getExceptionTypes()));
     }
@@ -222,7 +220,7 @@ public class MethodDescription implements Comparable<MethodDescription> {
         builder.append(')');
 
         if (genericSignature != null)
-        {builder.append(" <").append(genericSignature).append('>');}
+            builder.append(" <").append(genericSignature).append('>');
 
         sep = " throws ";
 
@@ -243,7 +241,8 @@ public class MethodDescription implements Comparable<MethodDescription> {
      *
      * @return method identifier
      */
-    public String toShortString() {
+    public String toShortString()
+    {
         StringBuilder builder = new StringBuilder(methodName).append('(');
 
         String sep = "";
