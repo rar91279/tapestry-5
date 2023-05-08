@@ -14,6 +14,7 @@ package org.apache.tapestry5.plastic;
 
 import org.apache.tapestry5.internal.plastic.PlasticInternalUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -36,6 +37,17 @@ import java.util.Arrays;
  */
 public class MethodDescription implements Comparable<MethodDescription>
 {
+    private static Method getSignatureAccessor;
+    static {
+        try
+        {
+            getSignatureAccessor = Method.class.getDeclaredMethod("getGenericSignature");
+            getSignatureAccessor.setAccessible(true);
+        } catch (NoSuchMethodException e)
+        {
+            // nope
+        }
+    }
     /**
      * The full set of modifier flags for the method.
      */
@@ -125,7 +137,22 @@ public class MethodDescription implements Comparable<MethodDescription>
     public MethodDescription(Method method)
     {
         this(method.getModifiers(), PlasticUtils.toTypeName(method.getReturnType()), method.getName(), PlasticUtils
-                .toTypeNames(method.getParameterTypes()), null, PlasticUtils.toTypeNames(method.getExceptionTypes()));
+                .toTypeNames(method.getParameterTypes()), MethodDescription.calculateGenerateGenericSignature(method), PlasticUtils.toTypeNames(method.getExceptionTypes()));
+    }
+
+    private static String calculateGenerateGenericSignature(Method method)
+    {
+        if(getSignatureAccessor!=null)
+        {
+            try
+            {
+                return (String) getSignatureAccessor.invoke(method);
+            } catch (IllegalAccessException | InvocationTargetException e)
+            {
+               // none
+            }
+        }
+        return null;
     }
 
     @Override
