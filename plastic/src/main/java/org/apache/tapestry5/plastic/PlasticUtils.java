@@ -14,6 +14,8 @@ package org.apache.tapestry5.plastic;
 
 import org.apache.tapestry5.internal.plastic.PrimitiveType;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -22,6 +24,20 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class PlasticUtils
 {
+    private static final VarHandle signatureAccessor;
+    static
+    {
+        try
+        {
+            signatureAccessor = MethodHandles.privateLookupIn(Method.class, MethodHandles.lookup())
+                    .findVarHandle(Method.class, "signature", String.class);
+
+        } catch (IllegalAccessException | NoSuchFieldException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * The {@code toString()} method inherited from Object.
      */
@@ -140,5 +156,13 @@ public class PlasticUtils
     public static boolean isPrimitive(String typeName)
     {
         return PrimitiveType.getByName(typeName) != null;
+    }
+
+    public static String getGenericSignatureOfMethod(Method method){
+        if(signatureAccessor!=null)
+        {
+            return (String) signatureAccessor.get(method);
+        }
+        return null;
     }
 }
