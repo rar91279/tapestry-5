@@ -14,13 +14,14 @@
 
 package org.apache.tapestry5.upload.internal.services;
 
-import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tapestry5.upload.services.UploadedFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.*;
 
 /**
  * Implentation of {@link org.apache.tapestry5.upload.services.UploadedFile} for FileItems.
@@ -100,5 +101,12 @@ public class UploadedFileItem implements UploadedFile
         {
             // ignore
         }
+    }
+    /** Gets the Path for the FileItem's data's temporary location on the disk. Note that for FileItems that have their data stored in memory, this method will return null. When handling large files, you can use Files.move(Path, Path, CopyOption...) to move the file to new location without copying the data, if the source and destination locations reside within the same logical volume.
+     *  Returns:
+     *  The data file, or null if the data is stored in memory.
+     */
+    public Path getPath() {
+        return ((DiskFileItem)item).getPath();
     }
 }
