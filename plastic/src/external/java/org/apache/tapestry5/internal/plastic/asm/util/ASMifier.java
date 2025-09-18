@@ -113,6 +113,14 @@ public class ASMifier extends Printer {
     classVersions.put(Opcodes.V20, "V20");
     classVersions.put(Opcodes.V21, "V21");
     classVersions.put(Opcodes.V22, "V22");
+    classVersions.put(Opcodes.V23, "V23");
+    classVersions.put(Opcodes.V24, "V24");
+    classVersions.put(Opcodes.V25, "V25");
+    classVersions.put(Opcodes.V26, "V26");
+    classVersions.put(Opcodes.V27, "V27");
+    classVersions.put(Opcodes.V28, "V28");
+    classVersions.put(Opcodes.V29, "V29");
+    classVersions.put(Opcodes.V30, "V30");
     CLASS_VERSIONS = Collections.unmodifiableMap(classVersions);
   }
 
